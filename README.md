@@ -75,14 +75,22 @@ cd GymGrind
 
 ### Step 3 — Configure the app credentials
 
-Open `GymGrind/Utilities/SupabaseClient.swift` and replace the values in `SupabaseConfig`:
+Copy the example secrets file and fill in your Supabase credentials:
+
+```bash
+cp GymGrind/Secrets.swift.example GymGrind/Secrets.swift
+```
+
+Then open `Secrets.swift` and replace the placeholder values:
 
 ```swift
-struct SupabaseConfig {
-    static let url     = "https://<your-project-id>.supabase.co"
-    static let anonKey = "<your-anon-key>"
+enum Secrets {
+    static let supabaseURL     = "https://<your-project-id>.supabase.co"
+    static let supabaseAnonKey = "<your-anon-key>"
 }
 ```
+
+> `Secrets.swift` is listed in `.gitignore` and will never be committed.
 
 ### Step 4 — Apply the database schema
 

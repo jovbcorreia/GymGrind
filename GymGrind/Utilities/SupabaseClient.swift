@@ -1,9 +1,11 @@
 import Foundation
 
 // MARK: - Config
+// Credentials are loaded from Secrets.swift (gitignored).
+// See Secrets.swift.example to set up your own.
 struct SupabaseConfig {
-    static let url     = "https://ptmgoqpdbunamqsnevdn.supabase.co"
-    static let anonKey = "sb_publishable_sFSM24YIYc92u41Gf7e2wg_d9yCJd7t"
+    static let url     = Secrets.supabaseURL
+    static let anonKey = Secrets.supabaseAnonKey
 }
 
 // MARK: - Auth State
