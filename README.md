@@ -2,84 +2,110 @@
 
 A native iOS fitness tracking app built with SwiftUI and Supabase. Log workouts, track nutrition, monitor body metrics, and visualise your progress — all synced to the cloud.
 
+---
+
+## Screenshots
+
+| | | |
+|---|---|---|
+| ![Login](screenshots/login.png) | ![Onboarding](screenshots/onboarding_name.png) | ![Goals](screenshots/onboarding_goals.png) |
+| Login | Onboarding — Who are you? | Onboarding — Set your goals |
+| ![Ready](screenshots/onboarding_ready.png) | ![Home](screenshots/home.png) | ![Workout](screenshots/workout.png) |
+| You're ready | Home Dashboard | Workout |
+| ![Progress](screenshots/progress.png) | ![Nutrition](screenshots/nutrition.png) | ![Add Food](screenshots/add_food.png) |
+| Progress | Nutrition | Add Food |
+
+---
+
 ## Features
 
-- **Workout Logging** — Create sessions, add exercises, log sets with weight & reps, and automatically detect personal records (PRs)
-- **Workout Templates** — Save and reuse workout templates for faster session creation
-- **Nutrition Tracking** — Log meals (breakfast, lunch, dinner, snacks) with calories, protein, carbs, and fat
-- **Body Metrics** — Track weight and body fat percentage over time
-- **Progress Charts** — Visualise exercise progress and body composition trends
-- **Onboarding** — First-launch flow to configure personal goals (calories, protein, carbs, fat, water)
 - **Authentication** — Email/password sign-up and login via Supabase Auth
+- **Onboarding** — First-launch flow to set your name, weight unit, and daily calorie goal
+- **Home Dashboard** — Daily summary of calories, volume lifted, and weekly sessions
+- **Workout Logging** — Create sessions, add exercises, log sets with weight & reps, auto-detect personal records (PRs)
+- **Workout Templates** — Save and reuse workout templates for faster session creation
+- **Nutrition Tracking** — Log meals with calories, protein, carbs, and fat; quick-add common foods
+- **Body Metrics** — Track weight and body fat percentage over time
+- **Progress Charts** — Visualise weekly volume, exercise progress, best lifts (PRs), and body composition trends
+- **Cloud Sync** — All data backed up to Supabase; pull everything on a new device after login
 - **Settings** — Customise weight unit (kg/lbs) and daily nutrition goals
+
+---
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| UI | SwiftUI |
-| Backend / Auth | Supabase (PostgreSQL + RLS) |
+### Frontend
+| | |
+|---|---|
+| Language | Swift |
+| UI Framework | SwiftUI |
+| Local Storage | SwiftData |
 | Architecture | MVVM |
-| Platform | iOS |
+| Platform | iOS 17+ |
 
-## Project Structure
+### Backend & Database
+| | |
+|---|---|
+| Database | Supabase (PostgreSQL) |
+| Authentication | Supabase Auth (email/password) |
+| Security | Row Level Security (RLS) — each user only accesses their own data |
+| API | Supabase REST API via custom HTTP client |
 
-```
-GymGrind/
-├── Models/          # Data models (WorkoutSession, ExerciseEntry, SetEntry, FoodEntry, BodyMetric, WorkoutTemplate)
-├── ViewModels/      # Business logic (WorkoutViewModel, NutritionViewModel, AppSettings)
-├── Views/
-│   ├── Auth/        # Login & sign-up screens
-│   ├── Dashboard/   # Home dashboard
-│   ├── Workout/     # Active workout, exercise search, workout history
-│   ├── Nutrition/   # Food log, add food
-│   ├── Progress/    # Charts and progress tracking
-│   ├── Settings/    # User preferences
-│   ├── Onboarding/  # First-launch setup
-│   └── Components/  # Shared UI components (PRBannerView, etc.)
-└── Utilities/       # SupabaseClient, SupabaseService, Theme
-```
+---
 
 ## Setup
 
 ### Prerequisites
 
-- Xcode 15+
-- A [Supabase](https://supabase.com) project
+- Xcode 15 or later
+- An iOS 17+ simulator or physical device
+- A [Supabase](https://supabase.com) account and project
 
-### 1. Clone the repo
+### Step 1 — Clone the repository
 
 ```bash
 git clone git@github.com:jovbcorreia/GymGrind.git
 cd GymGrind
 ```
 
-### 2. Configure Supabase
+### Step 2 — Create a Supabase project
 
-In `GymGrind/Utilities/SupabaseClient.swift`, replace the placeholder values with your project credentials:
+1. Go to [supabase.com](https://supabase.com) and create a new project
+2. Go to **Project Settings → API** and copy your **Project URL** and **anon/public key**
+
+### Step 3 — Configure the app credentials
+
+Open `GymGrind/Utilities/SupabaseClient.swift` and replace the values in `SupabaseConfig`:
 
 ```swift
-let supabaseURL = URL(string: "https://<your-project>.supabase.co")!
-let supabaseKey = "<your-anon-key>"
+struct SupabaseConfig {
+    static let url     = "https://<your-project-id>.supabase.co"
+    static let anonKey = "<your-anon-key>"
+}
 ```
 
-### 3. Apply the database schema
+### Step 4 — Apply the database schema
 
-In your Supabase project, open the **SQL Editor** and run the full contents of `supabase_schema.sql`. This creates all tables, enables Row Level Security, and sets up the auto-profile trigger.
+1. In your Supabase dashboard, open the **SQL Editor**
+2. Paste and run the full contents of `supabase_schema.sql`
 
-### 4. Open in Xcode
+This creates all tables, enables Row Level Security on each table, and sets up the auto-profile trigger that creates a user profile on sign-up.
+
+### Step 5 — Open in Xcode and run
 
 ```bash
 open GymGrind.xcodeproj
 ```
 
-Select a simulator or your device and press **Run**.
+Select an iPhone simulator (iOS 17+) and press **⌘R** to build and run.
+
+---
 
 ## Database Schema
 
 | Table | Description |
 |-------|-------------|
-| `profiles` | User settings and daily goals (extends `auth.users`) |
+| `profiles` | User settings and daily goals (linked to `auth.users`) |
 | `workout_sessions` | Workout sessions with name, date, and duration |
 | `exercise_entries` | Exercises within a session |
 | `set_entries` | Individual sets with weight, reps, and PR flag |
@@ -87,4 +113,12 @@ Select a simulator or your device and press **Run**.
 | `body_metrics` | Weight and body fat snapshots |
 | `workout_templates` | Reusable exercise lists |
 
-Row Level Security is enabled on all tables — each user can only access their own data.
+Row Level Security is enabled on all tables — each user can only read and write their own data.
+
+---
+
+## License
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+Created and owned by **João Vilas-Boas Correia** (joaopsn3@gmail.com)

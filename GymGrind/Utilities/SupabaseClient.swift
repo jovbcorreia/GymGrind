@@ -11,27 +11,20 @@ struct SupabaseConfig {
 class SupabaseAuth {
     static let shared = SupabaseAuth()
 
-    var accessToken: String? {
-        get { UserDefaults.standard.string(forKey: "sb_access_token") }
-        set { UserDefaults.standard.set(newValue, forKey: "sb_access_token") }
-    }
-
-    var refreshToken: String? {
-        get { UserDefaults.standard.string(forKey: "sb_refresh_token") }
-        set { UserDefaults.standard.set(newValue, forKey: "sb_refresh_token") }
-    }
-
-    var userId: String? {
-        get { UserDefaults.standard.string(forKey: "sb_user_id") }
-        set { UserDefaults.standard.set(newValue, forKey: "sb_user_id") }
-    }
-
-    var userEmail: String? {
-        get { UserDefaults.standard.string(forKey: "sb_user_email") }
-        set { UserDefaults.standard.set(newValue, forKey: "sb_user_email") }
-    }
+    // Stored properties so @Observable tracks changes and SwiftUI re-renders
+    var accessToken: String?
+    var refreshToken: String?
+    var userId: String?
+    var userEmail: String?
 
     var isLoggedIn: Bool { accessToken != nil && userId != nil }
+
+    init() {
+        accessToken  = UserDefaults.standard.string(forKey: "sb_access_token")
+        refreshToken = UserDefaults.standard.string(forKey: "sb_refresh_token")
+        userId       = UserDefaults.standard.string(forKey: "sb_user_id")
+        userEmail    = UserDefaults.standard.string(forKey: "sb_user_email")
+    }
 
     func signUp(email: String, password: String, username: String) async throws {
         let body: [String: Any] = [
@@ -61,10 +54,11 @@ class SupabaseAuth {
     }
 
     func signOut() {
-        accessToken = nil
+        accessToken  = nil
         refreshToken = nil
-        userId = nil
-        userEmail = nil
+        userId       = nil
+        userEmail    = nil
+        persist()
     }
 
     private func saveSession(_ r: AuthResponse) {
@@ -72,6 +66,14 @@ class SupabaseAuth {
         refreshToken = r.refresh_token
         userId       = r.user?.id
         userEmail    = r.user?.email
+        persist()
+    }
+
+    private func persist() {
+        UserDefaults.standard.set(accessToken,  forKey: "sb_access_token")
+        UserDefaults.standard.set(refreshToken, forKey: "sb_refresh_token")
+        UserDefaults.standard.set(userId,       forKey: "sb_user_id")
+        UserDefaults.standard.set(userEmail,    forKey: "sb_user_email")
     }
 }
 
